@@ -1,66 +1,35 @@
 const request = require('request');
-const htmlParser = require('htmlparser2');
 
-// This is the name of the id of the element we are interested in
-var ID_TO_FIND = 'data_display_cont';
-// THis is the url we want to load
-var URL = 'http://epic.gsfc.nasa.gov/';
-// I have to turn on logging when the parser sees `ID_TO_FIND`
-var isLoggingOn = false;
-// Keeps track of how many nested divs we've seen since logging was turned on.
-// A stack would be another way to do it ... push/pop instead of inc/dec
-var divCt = 0
+// This is the url we want to load
+var URL = 'http://epic.gsfc.nasa.gov/api/images.php?dates';
 
-var fileNameParser = new htmlParser.Parser({
-	// look for the image name
-});
+var availableDates = [];
+var BASE_ERROR_MSG = 'Something went wrong. ';
+
+function getAllImageDataFor (dates) {
+	dates.forEach(function (date) {
+		console.log(date);
+	});
+}
 
 // request will go fetch `URL` and call the callback function when it's ready
 request(URL, function (error, response, body) {
 	// ensure the request was successful
 	if (!error && response.statusCode === 200) {
-		var parser = new htmlParser.Parser({
-			onopentag: function(name, attributes) {
-				if (name === 'div' && attributes.id === ID_TO_FIND) {
-					console.log('Found the ' + ID_TO_FIND + ' element!');
-					isLoggingOn = true;
-				}
-				else if (isLoggingOn && name === 'div') {
-					console.log(attributes.class);
-					divCt++;
-				}
-			},
-			ontext: function(text) {
-				if (isLoggingOn) {
-					console.log('-->', text);
-				}
-			},
-			onclosetag: function(name) {
-				if (isLoggingOn && name === 'div') {
-					divCt--;
-					if (divCt < 0) {
-						isLoggingOn = false
-					}
-				}
+		try {
+			// body is expected
+			eval(body);
+			// enabledDates should be created by evaled body
+			if (enabledDates instanceof Array) {
+				availableDates = enabledDates;
 			}
-		}, {decodeEntities: true});
-
-		parser.write(body);
-		parser.end();
+			else {
+				throw new Error(BASE_ERROR_MSG + '`enabledDates` was not an instanceof Array.');
+			}
+		}
+		catch (e) {
+			console.log(BASE_ERROR_MSG + 'Could not eval response body');
+		}
+		getAllImageDataFor(availableDates);
 	}
 });
-
-// Keeping this down here so I don't forget about this `trumpet` library.
-// It's a much cleaner api for parsing html if you are ready to work with streams.
-
-// var trumpet = require('trumpet');
-// var tr = trumpet();
-
-// tr.select('.b span', function (node) {
-// 	node.html(function (html) {
-// 		console.log(node.name + ': ' + html);
-// 	});
-// });
-
-// var fs = require('fs');
-// fs.createReadStream(__dirname + '/select.html').pipe(tr);

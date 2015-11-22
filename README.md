@@ -23,6 +23,14 @@ $ pwd
 6. `git add .`
 7. `git commit -m 'my first commit'`
 
+After creating the first little bit I start exploring. How does their app work?
+
+It isn't making async requests like I would expect. Instead all the script tags are put in the head and they pull in both javascript and data.
+
+I thought the `/api/images.php?dates` source looked interesting so I found out it's a list of valid dates. I then removed the query parameter and got some VERY interesting results! Turns out I can make a request for any of the valid dates and get all the data I need for each image!!! Thank you NASA!
+
+At this point the project is going to pivot: we don't need to parse html since we can call the wonderful json apis provided to us! I'm going to now move `index.js` to a file with a more descriptive name, and start working on a different one to get the dates and use them!
+
 ## Fun other stuff to come:
 
 -define npm run for babel... it should do the request and we could demonstrate passing options
@@ -32,3 +40,4 @@ $ pwd
 
 
 
+![![]()]()
