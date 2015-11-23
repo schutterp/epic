@@ -18,6 +18,7 @@ var BASE_ERROR_MSG = 'Something went wrong. ';
 // overlay earth image with exxon brand (brand like a cow would get branded)
 
 
+
 /**
  * Loop over each date and:
  * -make a request to get the data for that date

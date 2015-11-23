@@ -32,6 +32,12 @@ I thought the `/api/images.php?dates` source looked interesting so I found out i
 At this point the project is going to pivot: we don't need to parse html since we can call the wonderful json apis provided to us! I'm going to now move `index.js` to a file with a more descriptive name, and start working on a different one to get the dates and use them!
 
 
+Plans:
+-create a lesson about getting an html page set up (static is fine)
+-playground for d3 and earth map
+-
+
+
 
 ## Fun other stuff to come:
 
