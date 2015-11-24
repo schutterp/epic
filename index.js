@@ -2,7 +2,7 @@ const request = require('request');
 const htmlParser = require('htmlparser2');
 
 // This is the name of the id of the element we are interested in
-var ID_TO_FIND = 'data_display_cont';
+var ID_TO_FIND = 'geofilter';
 // THis is the url we want to load
 var URL = 'http://epic.gsfc.nasa.gov/';
 // I have to turn on logging when the parser sees `ID_TO_FIND`
