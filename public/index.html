@@ -1,13 +1,28 @@
 <html doctype="html">
 	<head>
-		<script src="js/lib/d3.js"></script>
-		<script src="js/lib/topo.js"></script>
-		<script src="js/lib/d3.geo.projection.js"></script>
-		<script src="js/lessons/2/main.js"></script>
+		<style>
+			.main-container {
+				width: 100%;
+			}
+			.main {
+				width: 1280;
+				margin: 0 auto;
+			}
+			.world path {
+				stroke: #fff;
+				stroke-width: 0.25px;
+				fill: #b3c3c3;
+			}
+		</style>
+		<script src="js/lib/d3.js" charset="utf8"></script>
+		<script src="js/lib/topojson.js"></script>
+		<!-- <script src="js/lib/d3.geo.projection.js" charset="utf8"></script> -->
 	</head>
 	<body>
-		<div class="container">
-			<div class="canvas">hi</div>
+		<div class="main-container">
+			<div class="main">
+			</div>
 		</div>
+		<script src="js/lessons/2/main.js"></script>
 	</body>
 </html>
