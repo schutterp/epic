@@ -7,7 +7,7 @@ var projection = d3.geo.mercator()
 	// center around austin
 	.center([-97, 30])
 	// zoom in a bit
-	.scale(600)
+	.scale(300)
 	// ???
 	.rotate([0]);
 
