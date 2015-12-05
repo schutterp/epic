@@ -29,55 +29,19 @@ function rotateEarthByMinutes (minutes) {
 // pitch needs to increase for 47 degrees and then decrease 47 degrees,
 // 	fluctuating between -23.5 and 23.5
 var pitchAngle = -23.5;
-// 47 degree change in six months
-var minutesInSixMonths = 365 / 2 * (24 * 60);
-var degreeChangePerMinute = 47 / minutesInSixMonths;
-var maxPitch = 23.5;
-var minPitch = -23.5;
-var pitchIsIncreasing = true;
-function adjustPitchByMinutes (minutes) {
-	var newAngle;
-	var adjustPitchByDegrees = minutes * degreeChangePerMinute;
-	if (pitchIsIncreasing) {
-		newAngle = pitchAngle + adjustPitchByDegrees;
-	}
-	else {
-		newAngle = pitchAngle - adjustPitchByDegrees;
-	}
-	if (pitchIsIncreasing && newAngle > maxPitch) {
-		newAngle = maxPitch - (newAngle - maxPitch);
-		pitchIsIncreasing = false;
-	}
-	else if (!pitchIsIncreasing && newAngle < minPitch) {
-		newAngle = minPitch - (newAngle - minPitch);
-		pitchIsIncreasing = true;
-	}
-	pitchAngle = newAngle;
-}
 
-// TODO: DRY this as pitch and roll are handled the same
 // roll needs to increase for 47 degrees and then decrease 47 degrees,
 // 	fluctuating between -23.5 and 23.5
 var rollAngle = 0;
-var maxRoll = 23.5;
-var minRoll = -23.5;
-var rollIsIncreasing = false;
-function adjustRollByMinutes (minutes) {
-	var newAngle;
-	var adjustRollByDegrees = minutes * degreeChangePerMinute;
-	if (rollIsIncreasing) {
-		newAngle = rollAngle + adjustRollByDegrees;
-	}
-	else {
-		newAngle = rollAngle - adjustRollByDegrees;
-	}
-	if (rollIsIncreasing && newAngle > maxRoll) {
-		newAngle = maxRoll - (newAngle - maxRoll);
-		rollIsIncreasing = false;
-	}
-	else if (!rollIsIncreasing && newAngle < minRoll) {
-		newAngle = minRoll - (newAngle - minRoll);
-		rollIsIncreasing = true;
-	}
-	rollAngle = newAngle;
+
+var minutesSinceWinterSolstice = 0;
+var minutesInOneYear = 365 * 24 * 60;
+var radius = 23.5;
+function adjustPitchAndRollByMinutes (minutes) {
+	minutesSinceWinterSolstice = minutes + minutesSinceWinterSolstice;
+	var newAngle = minutesSinceWinterSolstice / minutesInOneYear * 360;
+	var pitchRadians = Math.cos(newAngle);
+	var rollRadians = Math.sin(newAngle);
+	rollAngle = radius * rollRadians;
+	pitchAngle = radius * pitchRadians;
 }

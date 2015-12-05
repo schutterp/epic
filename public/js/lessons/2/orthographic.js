@@ -82,17 +82,17 @@ function doRotation (minutes) {
 	console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
 	projection.rotate([rotationAngle, pitchAngle, rollAngle]);
 	svg.selectAll("path").attr("d", path);
-	// jump by week
+	// make the moves
 	rotateEarthByMinutes(minutes);
-	adjustPitchByMinutes(minutes);
-	adjustRollByMinutes(minutes);
+	adjustPitchAndRollByMinutes(minutes);
 }
 
 function continueRotating(minutes) {
 	setTimeout(function () {
 		doRotation(minutes);
 		continueRotating(minutes);
-	}, 500)
+	}, 1000)
 }
 // uncomment to start moving earth by minutes provided to `continueRotating`
-// continueRotating(7*60*24);
+// days * hours * min
+// continueRotating(7*24*60);
