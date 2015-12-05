@@ -1,5 +1,5 @@
 var width = 960,
-		height = 960;
+	height = 960;
 
 var projection = d3.geo.orthographic()
 		.scale(475)
@@ -76,3 +76,23 @@ d3.json('json/world-50m.json', function(error, world) {
 });
 
 d3.select(self.frameElement).style('height', height + 'px');
+
+
+function doRotation (minutes) {
+	console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
+	projection.rotate([rotationAngle, pitchAngle, rollAngle]);
+	svg.selectAll("path").attr("d", path);
+	// jump by week
+	rotateEarthByMinutes(minutes);
+	adjustPitchByMinutes(minutes);
+	adjustRollByMinutes(minutes);
+}
+
+function continueRotating(minutes) {
+	setTimeout(function () {
+		doRotation(minutes);
+		continueRotating(minutes);
+	}, 500)
+}
+// uncomment to start moving earth by minutes provided to `continueRotating`
+// continueRotating(7*60*24);

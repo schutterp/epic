@@ -21,7 +21,7 @@
 
 .graticule {
 	fill: none;
-	stroke: none;
+	stroke: #777;
 	stroke-width: .5px;
 	stroke-opacity: .5;
 }
