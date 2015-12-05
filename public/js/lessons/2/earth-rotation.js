@@ -13,9 +13,10 @@
 
 // rotation needs to maintain direction. Am I increasing?
 // example: start at -180, count up to 180 then reset to -180
-var rotationAngle = -180.0;
+var rotationAngle = 180.0;
+var degreesPerMin = 360 / (24 * 60);
 function rotateEarthByMinutes (minutes) {
-	var rotateByDegrees = minutes * (360 / (24 * 60));
+	var rotateByDegrees = minutes * degreesPerMin;
 	if (rotateByDegrees > 360) {
 		rotateByDegrees = rotateByDegrees % 360;
 	}
@@ -28,7 +29,7 @@ function rotateEarthByMinutes (minutes) {
 
 // pitch needs to increase for 47 degrees and then decrease 47 degrees,
 // 	fluctuating between -23.5 and 23.5
-var pitchAngle = -23.5;
+var pitchAngle = 23.5;
 
 // roll needs to increase for 47 degrees and then decrease 47 degrees,
 // 	fluctuating between -23.5 and 23.5
@@ -37,11 +38,14 @@ var rollAngle = 0;
 var minutesSinceWinterSolstice = 0;
 var minutesInOneYear = 365 * 24 * 60;
 var radius = 23.5;
+var i = 0;
+var degreesPerRadian = 360 / (2 * Math.PI);
 function adjustPitchAndRollByMinutes (minutes) {
 	minutesSinceWinterSolstice = minutes + minutesSinceWinterSolstice;
-	var newAngle = minutesSinceWinterSolstice / minutesInOneYear * 360;
-	var pitchRadians = Math.cos(newAngle);
-	var rollRadians = Math.sin(newAngle);
+	var newAngleDegrees = minutesSinceWinterSolstice / minutesInOneYear * 360;
+	var newAngleRadians = newAngleDegrees / degreesPerRadian;
+	var pitchRadians = Math.cos(newAngleRadians);
+	var rollRadians = Math.sin(newAngleRadians);
 	rollAngle = radius * rollRadians;
 	pitchAngle = radius * pitchRadians;
 }

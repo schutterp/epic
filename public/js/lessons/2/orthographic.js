@@ -2,97 +2,80 @@ var width = 960,
 	height = 960;
 
 var projection = d3.geo.orthographic()
-		.scale(475)
-		.translate([width / 2, height / 2])
-		.clipAngle(90)
-		.precision(.1)
-		// using these values I can position the earth to overlay on each image
-		.rotate([97,-32, 0]);
+	.scale(475)
+	.translate([width / 2, height / 2])
+	.clipAngle(90)
+	// how does this affect perf?
+	// .precision(.1)
+	.rotate([-180, 23.5, 0]);
 
 var path = d3.geo.path()
-		.projection(projection);
+	.projection(projection);
 
 var graticule = d3.geo.graticule();
 
 var svg = d3.select('.main').append('svg')
-		.attr('width', width)
-		.attr('height', height);
-
-var dragMove = function () {
-	var p = d3.mouse(this);
-	projection.rotate([λ(p[0]), φ(p[1])]);
-	svg.selectAll("path").attr("d", path);
-};
-
-var drag = d3.behavior.drag()
-	.origin(function() {
-		var r = projection.rotate();
-		return {
-			x: r[0],
-			y: -r[1]
-		};
-	})
-	.on("drag", dragMove);
+	.attr('width', width)
+	.attr('height', height);
 
 svg.append('defs').append('path')
-		.datum({type: 'Sphere'})
-		.attr('id', 'sphere')
-		.attr('d', path);
+	.datum({type: 'Sphere'})
+	.attr('id', 'sphere')
+	.attr('d', path);
 
 svg.append('use')
-		.attr('class', 'stroke')
-		.attr('xlink:href', '#sphere');
+	.attr('class', 'stroke')
+	.attr('xlink:href', '#sphere');
 
 svg.append('use')
-		.attr('class', 'fill')
-		.attr('xlink:href', '#sphere');
+	.attr('class', 'fill')
+	.attr('xlink:href', '#sphere');
 
-svg.append('path')
-		.datum(graticule)
-		.attr('class', 'graticule')
-		.attr('d', path);
+var grat = svg.append('path')
+	.datum(graticule)
+	.attr('class', 'graticule')
+	.attr('d', path);
 
-var λ = d3.scale.linear()
-    .domain([0, width])
-    .range([-180, 180]);
-
-var φ = d3.scale.linear()
-    .domain([0, height])
-    .range([90, -90]);
-
-d3.json('json/world-50m.json', function(error, world) {
+d3.json('json/world-110m.json', function(error, world) {
 	if (error) throw error;
 
-	svg.insert('path', '.graticule')
-			.datum(topojson.feature(world, world.objects.land))
-			.attr('class', 'land')
-			.attr('d', path)
-			.call(drag);
+	var land = svg.insert('path', '.graticule');
+	land.datum(topojson.feature(world, world.objects.land))
+		.attr('class', 'land')
+		.attr('d', path);
 
-	svg.insert('path', '.graticule')
-			.datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
-			.attr('class', 'boundary')
-			.attr('d', path);
+	// var countryBoundaries = svg.insert('path', '.graticule');
+	// countryBoundaries.datum(
+	// 	topojson.mesh(
+	// 		world,
+	// 		world.objects.countries,
+	// 		function(a, b) {
+	// 			return a !== b;
+	// 		}
+	// 	))
+	// 	.attr('class', 'boundary')
+	// 	.attr('d', path);
+
+	var ctr = 500;
+	var prevT = 0;
+	d3.timer(function (t) {
+		var deltaMs = t - prevT;
+		prevT = t;
+		console.log('time travel forward ' + deltaMs + ' minutes');
+		// console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
+
+		var minutes = deltaMs; // 7*24*60;
+		projection.rotate([rotationAngle, pitchAngle, rollAngle]);
+
+		land.attr('d', path);
+		grat.attr('d', path);
+
+		rotateEarthByMinutes(minutes);
+		adjustPitchAndRollByMinutes(minutes);
+
+		ctr--;
+		return ctr < 0;
+	});
 });
 
 d3.select(self.frameElement).style('height', height + 'px');
-
-
-function doRotation (minutes) {
-	console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
-	projection.rotate([rotationAngle, pitchAngle, rollAngle]);
-	svg.selectAll("path").attr("d", path);
-	// make the moves
-	rotateEarthByMinutes(minutes);
-	adjustPitchAndRollByMinutes(minutes);
-}
-
-function continueRotating(minutes) {
-	setTimeout(function () {
-		doRotation(minutes);
-		continueRotating(minutes);
-	}, 1000)
-}
-// uncomment to start moving earth by minutes provided to `continueRotating`
-// days * hours * min
-// continueRotating(7*24*60);
