@@ -36,10 +36,11 @@ var grat = svg.append('path')
 	.attr('class', 'graticule')
 	.attr('d', path);
 
+var land = svg.insert('path', '.graticule');
+
 d3.json('json/world-110m.json', function(error, world) {
 	if (error) throw error;
 
-	var land = svg.insert('path', '.graticule');
 	land.datum(topojson.feature(world, world.objects.land))
 		.attr('class', 'land')
 		.attr('d', path);
@@ -56,26 +57,34 @@ d3.json('json/world-110m.json', function(error, world) {
 	// 	.attr('class', 'boundary')
 	// 	.attr('d', path);
 
-	var ctr = 500;
-	var prevT = 0;
-	d3.timer(function (t) {
-		var deltaMs = t - prevT;
-		prevT = t;
-		console.log('time travel forward ' + deltaMs + ' minutes');
-		// console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
+	// var ctr = 500;
+	// var prevT = 0;
+	// d3.timer(function (t) {
+	// 	var deltaMs = t - prevT;
+	// 	prevT = t;
+	// 	console.log('time travel forward ' + deltaMs + ' minutes');
+	// 	// console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
 
-		var minutes = deltaMs; // 7*24*60;
-		projection.rotate([rotationAngle, pitchAngle, rollAngle]);
+	// 	var minutes = deltaMs; // 7*24*60;
+	// 	projection.rotate([rotationAngle, pitchAngle, rollAngle]);
 
-		land.attr('d', path);
-		grat.attr('d', path);
+	// 	land.attr('d', path);
+	// 	grat.attr('d', path);
 
-		rotateEarthByMinutes(minutes);
-		adjustPitchAndRollByMinutes(minutes);
+	// 	rotateEarthByMinutes(minutes);
+	// 	adjustPitchAndRollByMinutes(minutes);
 
-		ctr--;
-		return ctr < 0;
-	});
+	// 	ctr--;
+	// 	return ctr < 0;
+	// });
 });
 
 d3.select(self.frameElement).style('height', height + 'px');
+
+function timeTravelTo (date) {
+	projection.rotate(new Positioner(date));
+	land.attr('d', path);
+	grat.attr('d', path);
+}
+
+timeTravelTo(new Date(2015, 5, 2, 19, 30));
