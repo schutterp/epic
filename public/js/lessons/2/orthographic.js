@@ -87,4 +87,36 @@ function timeTravelTo (date) {
 	grat.attr('d', path);
 }
 
-timeTravelTo(new Date(2015, 5, 2, 19, 30));
+var getDateFromIsoDate = function (dateStr) {
+	var dateParts = dateStr.split('-');
+	// zero offset month (dateParts[1])
+	return [dateParts[0], dateParts[1] - 1, dateParts[2]];
+};
+
+document.getElementById('date-picker').addEventListener('change', function (e) {
+	goToChosenDatetime();
+});
+
+document.getElementById('time-picker').addEventListener('change', function (e) {
+	goToChosenDatetime();
+});
+
+
+function goToChosenDatetime () {
+	var chosenDate = document.getElementById('date-picker').value;
+	var chosenTime = document.getElementById('time-picker').value;
+	var dateParts, timeParts;
+	if (chosenDate.length) {
+		dateParts = getDateFromIsoDate(chosenDate);
+	}
+	else {
+		dateParts = [2015, 0, 1];
+	}
+	if (chosenTime.length) {
+		timeParts = chosenTime.split(':');
+	}
+	else {
+		timeParts = [0, 0];
+	}
+	timeTravelTo(new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1]));
+}
