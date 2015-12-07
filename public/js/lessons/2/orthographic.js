@@ -120,3 +120,5 @@ function goToChosenDatetime () {
 	}
 	timeTravelTo(new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1]));
 }
+
+goToChosenDatetime();
