@@ -1,8 +1,8 @@
-var width = 960,
-	height = 960;
+var width = 500,
+	height = 500;
 
 var projection = d3.geo.orthographic()
-	.scale(475)
+	.scale(200)
 	.translate([width / 2, height / 2])
 	.clipAngle(90)
 	// how does this affect perf?
@@ -14,7 +14,7 @@ var path = d3.geo.path()
 
 var graticule = d3.geo.graticule();
 
-var svg = d3.select('.main').append('svg')
+var svg = d3.select('.ortho-container').append('svg')
 	.attr('width', width)
 	.attr('height', height);
 
@@ -38,6 +38,9 @@ var grat = svg.append('path')
 
 var land = svg.insert('path', '.graticule');
 
+var startDate = new Date();
+var positioner = new Positioner(startDate);
+
 d3.json('json/world-110m.json', function(error, world) {
 	if (error) throw error;
 
@@ -45,6 +48,9 @@ d3.json('json/world-110m.json', function(error, world) {
 		.attr('class', 'land')
 		.attr('d', path);
 
+	projection.rotate(positioner.getRotation());
+	land.attr('d', path);
+	grat.attr('d', path);
 	// var countryBoundaries = svg.insert('path', '.graticule');
 	// countryBoundaries.datum(
 	// 	topojson.mesh(
@@ -56,35 +62,55 @@ d3.json('json/world-110m.json', function(error, world) {
 	// 	))
 	// 	.attr('class', 'boundary')
 	// 	.attr('d', path);
-
-	// var ctr = 500;
-	// var prevT = 0;
-	// d3.timer(function (t) {
-	// 	var deltaMs = t - prevT;
-	// 	prevT = t;
-	// 	console.log('time travel forward ' + deltaMs + ' minutes');
-	// 	// console.log('euler angles: ', [rotationAngle, pitchAngle, rollAngle]);
-
-	// 	var minutes = deltaMs; // 7*24*60;
-	// 	projection.rotate([rotationAngle, pitchAngle, rollAngle]);
-
-	// 	land.attr('d', path);
-	// 	grat.attr('d', path);
-
-	// 	rotateEarthByMinutes(minutes);
-	// 	adjustPitchAndRollByMinutes(minutes);
-
-	// 	ctr--;
-	// 	return ctr < 0;
-	// });
 });
 
 d3.select(self.frameElement).style('height', height + 'px');
 
+var animationInProgress = false;
+
 function timeTravelTo (date) {
-	projection.rotate(new Positioner(date));
-	land.attr('d', path);
-	grat.attr('d', path);
+	var minDelta = (date - positioner.getDate()) / 60 / 1000;
+	if (minDelta === 0) {
+		return;
+	}
+	else {
+		moveForward = minDelta > 0 ? 1 : -1;
+	}
+	// ensures minLeftToTravel is a positive number
+	var minLeftToTravel = minDelta * moveForward;
+	var prevT = 0;
+
+	if (animationInProgress) {
+		return;
+	}
+
+	// rotate until the difference in minutes is used up
+	d3.timer(function (t) {
+		var deltaMs = t - prevT;
+		prevT = t;
+		if (deltaMs > minLeftToTravel) {
+			deltaMs = minLeftToTravel;
+		}
+		minLeftToTravel = minLeftToTravel - deltaMs;
+
+		console.log('time travel ' + (moveForward > 0 ? 'forward ' : 'backward ') + deltaMs + ' minutes');
+
+		positioner.rotateByMin(moveForward * deltaMs);
+		projection.rotate(positioner.getRotation());
+		land.attr('d', path);
+		grat.attr('d', path);
+
+		displayDateAndTime(positioner.getDate());
+
+		animationInProgress = minLeftToTravel > 0;
+		return !animationInProgress;
+	});
+
+}
+
+function displayDateAndTime(date) {
+	document.getElementById('current-time').innerHTML = date.toTimeString().slice(0,8);
+	document.getElementById('current-date').innerHTML = date.toDateString();
 }
 
 var getDateFromIsoDate = function (dateStr) {
@@ -93,14 +119,9 @@ var getDateFromIsoDate = function (dateStr) {
 	return [dateParts[0], dateParts[1] - 1, dateParts[2]];
 };
 
-document.getElementById('date-picker').addEventListener('change', function (e) {
+document.getElementById('do-time-travel').addEventListener('click', function () {
 	goToChosenDatetime();
 });
-
-document.getElementById('time-picker').addEventListener('change', function (e) {
-	goToChosenDatetime();
-});
-
 
 function goToChosenDatetime () {
 	var chosenDate = document.getElementById('date-picker').value;
@@ -121,4 +142,7 @@ function goToChosenDatetime () {
 	timeTravelTo(new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1]));
 }
 
-goToChosenDatetime();
+// document.getElementById('date-picker').value = toDateInputValue(startDate);
+document.getElementById('date-picker').valueAsDate = startDate;
+document.getElementById('time-picker').value = startDate.toTimeString().slice(0,8);
+displayDateAndTime(startDate);
