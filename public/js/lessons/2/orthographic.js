@@ -108,6 +108,16 @@ function timeTravelTo (date) {
 
 }
 
+function jumpTo(date) {
+	if (animationInProgress) {
+		return;
+	}
+	positioner = new Positioner(date);
+	projection.rotate(positioner.getRotation());
+	land.attr('d', path);
+	grat.attr('d', path);
+}
+
 function displayDateAndTime(date) {
 	document.getElementById('current-time').innerHTML = date.toTimeString().slice(0,8);
 	document.getElementById('current-date').innerHTML = date.toDateString();
@@ -119,11 +129,15 @@ var getDateFromIsoDate = function (dateStr) {
 	return [dateParts[0], dateParts[1] - 1, dateParts[2]];
 };
 
-document.getElementById('do-time-travel').addEventListener('click', function () {
-	goToChosenDatetime();
+document.getElementById('do-time-jump').addEventListener('click', function () {
+	jumpToChosenDatetime();
 });
 
-function goToChosenDatetime () {
+document.getElementById('do-time-travel').addEventListener('click', function () {
+	animateToChosenDatetime();
+});
+
+function animateToChosenDatetime() {
 	var chosenDate = document.getElementById('date-picker').value;
 	var chosenTime = document.getElementById('time-picker').value;
 	var dateParts, timeParts;
@@ -140,6 +154,25 @@ function goToChosenDatetime () {
 		timeParts = [0, 0];
 	}
 	timeTravelTo(new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1]));
+}
+
+function jumpToChosenDatetime() {
+	var chosenDate = document.getElementById('date-picker').value;
+	var chosenTime = document.getElementById('time-picker').value;
+	var dateParts, timeParts;
+	if (chosenDate.length) {
+		dateParts = getDateFromIsoDate(chosenDate);
+	}
+	else {
+		dateParts = [2015, 0, 1];
+	}
+	if (chosenTime.length) {
+		timeParts = chosenTime.split(':');
+	}
+	else {
+		timeParts = [0, 0];
+	}
+	jumpTo(new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1]));
 }
 
 // document.getElementById('date-picker').value = toDateInputValue(startDate);

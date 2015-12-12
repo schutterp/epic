@@ -56,10 +56,10 @@ body {
 	font-size: 2rem;
 }
 
-#do-time-travel {
+.time-travel button {
 	color: #fff;
 	background-color: #777;
-	font-size: 2rem;
+	font-size: 1.5rem;
 	border-radius: .2rem;
 	cursor: pointer;
 	margin: .5rem;
